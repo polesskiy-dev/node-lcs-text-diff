@@ -50,19 +50,31 @@ class Diff {
       .filter(sequence =>
         sequence.find(diffTransformation => diffTransformation.action === DiffTransformation.INSERT) && sequence.find(diffTransformation => diffTransformation.action === DiffTransformation.DELETE))
 
-    return changesCandidates.map(changesCandidate => {
+    return _.flattenDeep(changesCandidates.map(changesCandidate => {
       let inserts = changesCandidate.filter(diffTransformation => diffTransformation.action === DiffTransformation.INSERT);
       let deletes = changesCandidate.filter(diffTransformation => diffTransformation.action === DiffTransformation.DELETE);
 
       if (deletes.length > inserts.length) deletes = deletes.slice(deletes.length - inserts.length, deletes.length);
       if (inserts.length > deletes.length) inserts = inserts.slice(inserts.length - deletes.length, inserts.length);
 
-      return [...inserts, ...deletes]
-    })
+      const changes = deletes.map((deleteDiffTransformation, index) => new DiffTransformation(deleteDiffTransformation.index, inserts[index].indexMutated, DiffTransformation.CHANGE, `${deleteDiffTransformation.content} | ${inserts[index].content}`));
+
+      return changes
+    }))
   }
 
+   replaceInsertDeleteByAppropriateChanges(changes) {
+      // remove insert, delete diffActions duplicated by change diffActions
+     changes.forEach(changeDiffTransformation => {
+       console.log(_.findIndex(diffTransformation => (diffTransformation.index === changeDiffTransformation.index && diffTransformation.action === DiffTransformation.DELETE))(this.diffStack))
+       console.log(_.findIndex(diffTransformation => (diffTransformation.indexMutated === changeDiffTransformation.indexMutated && diffTransformation.action === DiffTransformation.INSERT))(this.diffStack))
+       //this.diffStack.filter(diffTransformation => !(diffTransformation.index === changeDiffTransformation.index && diffTransformation.action === DiffTransformation.DELETE) && !(diffTransformation.indexMutated === changeDiffTransformation.indexMutated && diffTransformation.action === DiffTransformation.INSERT))
+     })
+   }
+
   toString() {
-    console.log(this.getChanges().map(a => a.map(v => v.toString())));
+    //console.log(this.getChanges().map(v => v.toString()));
+    this.replaceInsertDeleteByAppropriateChanges(this.getChanges())
 
     return this.diffStack.map(v=>v.toString())
   }
