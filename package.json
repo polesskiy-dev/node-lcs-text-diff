@@ -4,11 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js ./example-files/1.txt ./example-files/2.txt"
   },
   "author": "Ploesskiy",
-  "license": "ISC",
-  "dependencies": {
-    "lodash": "^4.17.4"
-  }
+  "license": "ISC"
 }
